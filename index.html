@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21-Day Field Manual — GenAI Fresher Sprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#11161d;
+  --surface:#1a212b;
+  --surface-2:#212a35;
+  --line:#2c3542;
+  --line-soft:#232b35;
+  --amber:#d3a15a;
+  --amber-dim:#8a6c3f;
+  --teal:#5fb0a1;
+  --teal-dim:#3d6f66;
+  --text:#e9e4d6;
+  --text-dim:#a7ac b2;
+  --text-dim:#9aa0a8;
+  --text-mute:#6c7580;
+  --paper:#f3eee1;
+  --danger:#c96a5a;
+  --radius:10px;
+  --font-display:'Fraunces', serif;
+  --font-mono:'IBM Plex Mono', monospace;
+  --font-body:'Inter', sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--amber);}
+::selection{background:var(--amber-dim);color:var(--paper);}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 32px;
+  background:rgba(17,22,29,0.92);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line-soft);
+}
+.nav-mark{
+  font-family:var(--font-mono); font-size:13px; letter-spacing:0.08em;
+  color:var(--text-dim); text-transform:uppercase;
+}
+.nav-mark b{color:var(--amber); font-weight:600;}
+.nav-links{display:flex; gap:22px;}
+.nav-links a{
+  font-family:var(--font-mono); font-size:12px; letter-spacing:0.04em;
+  color:var(--text-dim); text-decoration:none; text-transform:uppercase;
+  border-bottom:1px solid transparent; padding-bottom:2px;
+}
+.nav-links a:hover{color:var(--amber); border-color:var(--amber-dim);}
+@media (max-width:720px){ .nav-links{display:none;} }
+
+/* ---------- HERO ---------- */
+.hero{
+  max-width:920px; margin:0 auto; padding:72px 32px 40px;
+}
+.eyebrow{
+  font-family:var(--font-mono); font-size:12px; letter-spacing:0.14em;
+  text-transform:uppercase; color:var(--teal); margin-bottom:18px;
+  display:flex; align-items:center; gap:10px;
+}
+.eyebrow::before{content:''; width:22px; height:1px; background:var(--teal-dim);}
+h1.display{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(38px,6vw,66px);
+  line-height:1.03; margin:0 0 20px; color:var(--paper);
+  letter-spacing:-0.01em;
+}
+h1.display em{font-style:italic; color:var(--amber); font-weight:500;}
+.hero-sub{
+  font-size:17px; color:var(--text-dim); max-width:560px; margin:0 0 36px;
+}
+.stat-row{display:flex; flex-wrap:wrap; gap:0; border-top:1px solid var(--line); }
+.stat{
+  flex:1; min-width:130px; padding:18px 20px 18px 0; border-right:1px solid var(--line);
+}
+.stat:last-child{border-right:none;}
+.stat-num{font-family:var(--font-mono); font-size:26px; color:var(--amber); font-weight:600;}
+.stat-label{font-size:12px; color:var(--text-mute); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;}
+
+/* ---------- RUNWAY (signature element) ---------- */
+.runway-wrap{
+  max-width:1180px; margin:0 auto; padding:20px 32px 64px;
+}
+.runway-label{
+  font-family:var(--font-mono); font-size:12px; color:var(--text-mute);
+  text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;
+}
+.runway{
+  display:flex; overflow-x:auto; gap:2px; padding-bottom:14px;
+  scrollbar-width:thin; scrollbar-color:var(--line) transparent;
+}
+.runway::-webkit-scrollbar{height:6px;}
+.runway::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+.stub{
+  flex:0 0 auto; width:88px; min-height:118px;
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:6px; padding:10px 8px; cursor:pointer;
+  display:flex; flex-direction:column; justify-content:space-between;
+  transition:border-color 0.15s, background 0.15s;
+  position:relative;
+}
+.stub:hover{border-color:var(--amber-dim); background:var(--surface-2);}
+.stub.active{border-color:var(--amber); background:var(--surface-2);}
+.stub-day{font-family:var(--font-mono); font-size:11px; color:var(--text-mute);}
+.stub-num{font-family:var(--font-mono); font-size:20px; font-weight:600; color:var(--paper);}
+.stub-focus{font-size:10.5px; color:var(--text-dim); line-height:1.3; margin-top:6px;}
+.stub-dot{
+  width:7px; height:7px; border-radius:50%; background:var(--line);
+  position:absolute; top:10px; right:10px;
+}
+.stub.done .stub-dot{background:var(--teal);}
+.stub.wk1{border-top:2px solid var(--amber-dim);}
+.stub.wk2{border-top:2px solid var(--teal-dim);}
+.stub.wk3{border-top:2px solid #8e7fc9;}
+
+/* ---------- SECTIONS ---------- */
+section{max-width:920px; margin:0 auto; padding:64px 32px;}
+.section-head{margin-bottom:32px;}
+.section-num{font-family:var(--font-mono); font-size:12px; color:var(--text-mute);}
+h2.section-title{
+  font-family:var(--font-display); font-size:32px; font-weight:600;
+  color:var(--paper); margin:6px 0 0;
+}
+.section-desc{color:var(--text-dim); font-size:15px; margin-top:10px; max-width:640px;}
+
+/* ---------- WEEK BLOCKS ---------- */
+.week-banner{
+  display:flex; align-items:baseline; gap:14px; margin:56px 0 22px;
+  padding-bottom:12px; border-bottom:1px solid var(--line);
+}
+.week-banner:first-child{margin-top:0;}
+.week-tag{
+  font-family:var(--font-mono); font-size:12px; padding:3px 9px; border-radius:20px;
+  text-transform:uppercase; letter-spacing:0.05em; font-weight:600;
+}
+.wk1-tag{background:rgba(211,161,90,0.14); color:var(--amber);}
+.wk2-tag{background:rgba(95,176,161,0.14); color:var(--teal);}
+.wk3-tag{background:rgba(142,127,201,0.16); color:#a99bdb;}
+.week-title{font-family:var(--font-display); font-size:22px; color:var(--paper); font-weight:500;}
+.week-goal{font-size:13px; color:var(--text-mute); margin-left:auto; text-align:right;}
+
+.day-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  margin-bottom:10px; overflow:hidden; scroll-margin-top:90px;
+}
+.day-head{
+  display:flex; align-items:center; gap:14px; padding:16px 18px; cursor:pointer;
+  user-select:none;
+}
+.day-head:hover{background:var(--surface-2);}
+.day-check{
+  width:20px; height:20px; border-radius:5px; border:1.5px solid var(--line);
+  flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+  font-size:12px; color:var(--bg); transition:all 0.15s;
+}
+.day-check.checked{background:var(--teal); border-color:var(--teal);}
+.day-num{font-family:var(--font-mono); color:var(--text-mute); font-size:13px; width:46px; flex:0 0 auto;}
+.day-title{font-weight:500; font-size:15px; flex:1;}
+.day-arrow{color:var(--text-mute); font-size:13px; transition:transform 0.15s;}
+.day-card.open .day-arrow{transform:rotate(90deg); color:var(--amber);}
+.day-body{
+  display:none; padding:4px 18px 20px 78px; font-size:14px; color:var(--text-dim);
+}
+.day-card.open .day-body{display:block;}
+.day-row{margin-bottom:12px;}
+.day-row-label{
+  font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase;
+  letter-spacing:0.06em; color:var(--amber); margin-bottom:3px;
+}
+.day-row-label.b{color:var(--teal);}
+.qa-list{margin:4px 0 0; padding-left:18px;}
+.qa-list li{margin-bottom:3px;}
+
+/* ---------- SKILL MATRIX ---------- */
+.matrix{width:100%; border-collapse:collapse; font-size:13.5px;}
+.matrix th{
+  text-align:left; font-family:var(--font-mono); font-size:11px; text-transform:uppercase;
+  letter-spacing:0.05em; color:var(--text-mute); padding:0 12px 10px; border-bottom:1px solid var(--line);
+}
+.matrix td{padding:12px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.pri{
+  font-family:var(--font-mono); font-size:10.5px; padding:2px 8px; border-radius:20px;
+  text-transform:uppercase; white-space:nowrap;
+}
+.pri-crit{background:rgba(201,106,90,0.15); color:var(--danger);}
+.pri-high{background:rgba(211,161,90,0.15); color:var(--amber);}
+.pri-med{background:rgba(95,176,161,0.15); color:var(--teal);}
+
+/* ---------- TOPIC CHIPS ---------- */
+.topic-group{margin-bottom:24px;}
+.topic-group-label{font-size:13px; color:var(--text-mute); margin-bottom:10px;}
+.chips{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{
+  font-family:var(--font-mono); font-size:12.5px; padding:6px 12px; border-radius:6px;
+  border:1px solid var(--line); color:var(--text-dim);
+}
+.chip.core{border-color:var(--amber-dim); color:var(--amber);}
+.chip.imp{border-color:var(--teal-dim); color:var(--teal);}
+
+/* ---------- RESOURCES ---------- */
+.res-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
+.res-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;
+}
+.res-card h4{margin:0 0 10px; font-size:13px; color:var(--text-mute); font-weight:500; text-transform:uppercase; letter-spacing:0.03em; font-family:var(--font-mono);}
+.res-card a{
+  display:block; font-size:14px; color:var(--text); text-decoration:none; padding:5px 0;
+  border-bottom:1px dashed var(--line-soft);
+}
+.res-card a:last-child{border-bottom:none;}
+.res-card a:hover{color:var(--amber);}
+
+/* ---------- QUESTION BANK TABS ---------- */
+.tabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;}
+.tab-btn{
+  font-family:var(--font-mono); font-size:12px; padding:7px 13px; border-radius:20px;
+  border:1px solid var(--line); background:transparent; color:var(--text-mute); cursor:pointer;
+}
+.tab-btn.active{border-color:var(--amber); color:var(--amber); background:rgba(211,161,90,0.08);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.q-list{list-style:none; margin:0; padding:0;}
+.q-list li{
+  padding:12px 0; border-bottom:1px solid var(--line-soft); font-size:14.5px; color:var(--text-dim);
+  display:flex; gap:12px;
+}
+.q-list li::before{content:'—'; color:var(--amber-dim); flex:0 0 auto;}
+
+/* ---------- JOB TITLES ---------- */
+.title-cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+.title-col{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px;}
+.title-col h4{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; margin:0 0 12px;}
+.title-col.go h4{color:var(--teal);}
+.title-col.stretch h4{color:var(--amber);}
+.title-col.skip h4{color:var(--text-mute);}
+.title-col ul{margin:0; padding-left:18px; font-size:14px; color:var(--text-dim);}
+.title-col li{margin-bottom:6px;}
+
+/* ---------- FOOTER CTA ---------- */
+.cta{
+  max-width:920px; margin:0 auto 90px; padding:0 32px;
+}
+.cta-box{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:32px 36px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+}
+.cta-box h3{font-family:var(--font-display); font-size:20px; margin:0 0 6px; color:var(--paper); font-weight:500;}
+.cta-box p{margin:0; font-size:13.5px; color:var(--text-mute); font-family:var(--font-mono);}
+
+footer{
+  text-align:center; padding:30px; font-family:var(--font-mono); font-size:11px; color:var(--text-mute);
+  border-top:1px solid var(--line-soft);
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-mark">FIELD MANUAL <b>·</b> GENAI SPRINT</div>
+  <div class="nav-links">
+    <a href="#runway">Timeline</a>
+    <a href="#gaps">Gap analysis</a>
+    <a href="#resources">Resources</a>
+    <a href="#questions">Question bank</a>
+    <a href="#titles">Job titles</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">21 days · fresher genai / ai engineer track</div>
+  <h1 class="display">From repo to <em>interview-ready</em>.</h1>
+  <p class="hero-sub">A day-by-day sprint built from your resume and four working projects — Smart PDF Chat, the multi-turn chatbot, Text-to-SQL, and the job application assistant. No filler topics, no unnecessary technologies.</p>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-num">21</div><div class="stat-label">Days</div></div>
+    <div class="stat"><div class="stat-num">7h</div><div class="stat-label">Per day</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Projects covered</div></div>
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">Mock interviews</div></div>
+  </div>
+</div>
+
+<div class="runway-wrap" id="runway">
+  <div class="runway-label">Tap a day to jump to its plan</div>
+  <div class="runway" id="runwayStrip"></div>
+</div>
+
+<section id="gaps">
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <h2 class="section-title">Skill gap analysis</h2>
+    <p class="section-desc">Honest, resume-based. This is what actually decides how the 21 days are spent.</p>
+  </div>
+  <table class="matrix">
+    <tr><th>Skill</th><th>Gap</th><th>Priority</th></tr>
+    <tr><td>DSA / core CS</td><td>Absent from resume entirely — the single biggest interview risk</td><td><span class="pri pri-crit">Critical</span></td></tr>
+    <tr><td>Design reasoning</td><td>Can describe what was built, not yet tested on defending why</td><td><span class="pri pri-crit">Critical</span></td></tr>
+    <tr><td>RAG evaluation</td><td>No retrieval accuracy or latency metrics measured yet</td><td><span class="pri pri-crit">Critical</span></td></tr>
+    <tr><td>Live deployment</td><td>Docker listed as a skill, nothing evidenced as deployed</td><td><span class="pri pri-high">High</span></td></tr>
+    <tr><td>System design</td><td>No evidence of scaling / concurrency / cost-at-scale thinking</td><td><span class="pri pri-high">High</span></td></tr>
+    <tr><td>LangChain / Agents</td><td>Not on resume — conversational fluency needed, not mastery</td><td><span class="pri pri-med">Medium</span></td></tr>
+    <tr><td>Cloud (AWS)</td><td>Not on resume — conceptual only, no hands-on labs in scope</td><td><span class="pri pri-med">Medium</span></td></tr>
+  </table>
+</section>
+
+<section id="plan">
+  <div class="section-head">
+    <div class="section-num">02</div>
+    <h2 class="section-title">The 21-day plan</h2>
+    <p class="section-desc">1.5h DSA/SQL · 2.5h new topic · 2h project work · 1h revision, every day. Check off days as you close them.</p>
+  </div>
+  <div id="weeksHost"></div>
+</section>
+
+<section id="topics">
+  <div class="section-head">
+    <div class="section-num">03</div>
+    <h2 class="section-title">Topic coverage</h2>
+    <p class="section-desc">What needs to be interview-solid vs. conversational-only in three weeks.</p>
+  </div>
+  <div class="topic-group">
+    <div class="topic-group-label">Must be solid</div>
+    <div class="chips">
+      <span class="chip core">Python</span><span class="chip core">FastAPI</span><span class="chip core">Prompt engineering</span>
+      <span class="chip core">LLM APIs</span><span class="chip core">Embeddings</span><span class="chip core">RAG + evaluation</span>
+      <span class="chip core">Vector DBs</span><span class="chip core">SQL</span><span class="chip core">Git</span>
+    </div>
+  </div>
+  <div class="topic-group">
+    <div class="topic-group-label">Conversational fluency only</div>
+    <div class="chips">
+      <span class="chip imp">LangChain</span><span class="chip imp">Agents / tool use</span><span class="chip imp">Docker</span>
+      <span class="chip imp">AWS basics</span><span class="chip imp">Deployment (1 platform)</span>
+    </div>
+  </div>
+  <div class="topic-group">
+    <div class="topic-group-label">Out of scope — say so honestly if asked</div>
+    <div class="chips">
+      <span class="chip">LangGraph</span><span class="chip">Multi-cloud</span><span class="chip">MLOps tooling</span><span class="chip">Fine-tuning</span><span class="chip">Kubernetes</span>
+    </div>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="section-head">
+    <div class="section-num">04</div>
+    <h2 class="section-title">Resource library</h2>
+    <p class="section-desc">All free. No signups beyond a free account anywhere.</p>
+  </div>
+  <div class="res-grid" id="resHost"></div>
+</section>
+
+<section id="questions">
+  <div class="section-head">
+    <div class="section-num">05</div>
+    <h2 class="section-title">Interview question bank</h2>
+    <p class="section-desc">Same bank the daily plan draws from. Say "start mock interview" in chat to be tested on these live.</p>
+  </div>
+  <div class="tabs" id="tabBar"></div>
+  <div id="tabHost"></div>
+</section>
+
+<section id="titles">
+  <div class="section-head">
+    <div class="section-num">06</div>
+    <h2 class="section-title">Realistic job titles</h2>
+    <p class="section-desc">Based on what's actually evidenced in your projects today.</p>
+  </div>
+  <div class="title-cols">
+    <div class="title-col go">
+      <h4>Apply here first</h4>
+      <ul>
+        <li>GenAI Developer (Fresher)</li>
+        <li>AI/ML Engineer Trainee</li>
+        <li>LLM Application Engineer (Entry)</li>
+        <li>Python Backend Developer, AI-focused</li>
+        <li>AI Product Engineer (junior, startups)</li>
+      </ul>
+    </div>
+    <div class="title-col stretch">
+      <h4>Stretch — after Week 2</h4>
+      <ul>
+        <li>Applied AI Engineer</li>
+        <li>ML Engineer (Fresher, application-focused JDs)</li>
+        <li>AI Solutions Engineer</li>
+      </ul>
+    </div>
+    <div class="title-col skip">
+      <h4>Skip for now</h4>
+      <ul>
+        <li>ML Research roles</li>
+        <li>MLOps Engineer</li>
+        <li>Data Scientist</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="cta">
+  <div class="cta-box">
+    <div>
+      <h3>Ready to run a mock interview?</h3>
+      <p>Say "start mock interview" or "weekly test" back in chat — both run live.</p>
+    </div>
+  </div>
+</div>
+
+<footer>21-DAY FIELD MANUAL · BUILT FROM YOUR RESUME AND PROJECTS · PROGRESS RESETS ON RELOAD</footer>
+
+<script>
+const WEEKS = [
+  {
+    tag:'Week 01', tagClass:'wk1-tag', title:'Stop the bleeding', goal:'Fix critical gaps',
+    days:[
+      {n:1, focus:'PDF Chat audit', title:'Audit Smart PDF Chat, start Project Brief 1',
+        dsa:'NeetCode Arrays & Hashing — 3 problems',
+        learn:'Re-read Smart PDF Chat code end to end. List every decision you can\u2019t explain.',
+        build:'Start Project Brief 1 (architecture, 3 decisions, 1 limitation)',
+        qs:['Walk me through what happens from PDF upload to answer generation.','Why did you choose ChromaDB over FAISS or Pinecone?']},
+      {n:2, focus:'Chunking test', title:'Test chunk sizes on your own PDF chat',
+        dsa:'NeetCode Arrays & Hashing — 3 more problems',
+        learn:'Pinecone — Semantic Search + Chunking Strategies, read critically against your own choice',
+        build:'Re-run PDF chat with 2 chunk sizes on the same doc, compare quality',
+        qs:['What chunk size did you use, and how did you decide?','How do you know your retrieval is actually accurate?']},
+      {n:3, focus:'RAG evaluation', title:'Build a manual eval set for your RAG pipeline',
+        dsa:'LeetCode SQL 50 — 5 problems',
+        learn:'Ragas docs — faithfulness and answer relevance concepts',
+        build:'Manual 10-question eval set for your PDF chat, score it yourself',
+        qs:['How would you scale this to 1 million PDFs?','What happens if retrieved chunks don\u2019t contain the answer?']},
+      {n:4, focus:'FastAPI + Brief 2', title:'FastAPI depth, start Project Brief 2',
+        dsa:'NeetCode Two Pointers — 3 problems',
+        learn:'FastAPI docs — Dependency Injection + Background Tasks',
+        build:'Finish Project Brief 1, start Project Brief 2 (Chatbot)',
+        qs:['Why Redis instead of an in-memory dict or plain DB?','Why SSE and not WebSockets?']},
+      {n:5, focus:'Docker', title:'Containerize the chatbot',
+        dsa:'NeetCode Two Pointers — 3 more problems',
+        learn:'Docker Curriculum',
+        build:'Write a Dockerfile + docker-compose for app + Redis',
+        qs:['How do you handle a conversation exceeding context window?','How would this scale to 10,000 concurrent users?']},
+      {n:6, focus:'Go live', title:'Deploy one project — get a public URL',
+        dsa:'Mixed review — 3 array/string + 2 SQL problems',
+        learn:'Render docs — free-tier deployment',
+        build:'Deploy one project live. Highest-leverage task of the week.',
+        qs:['Weekly test covering Days 1\u20136 — say "weekly test" in chat.']},
+      {n:7, focus:'Rest + review', title:'Reread briefs aloud, flashcards, optional mock',
+        dsa:'Rest day',
+        learn:'Flashcard pass on Week 1 terms',
+        build:'Reread both Project Briefs out loud, no notes',
+        qs:['Optional: say "start mock interview" for Python + RAG topics.']}
+    ]
+  },
+  {
+    tag:'Week 02', tagClass:'wk2-tag', title:'Go deeper', goal:'GenAI depth + system design',
+    days:[
+      {n:8, focus:'Agents design', title:'LangChain agents, sketch a tool-calling design',
+        dsa:'NeetCode Trees — 3 problems',
+        learn:'LangChain Agents docs (conceptual read)',
+        build:'Sketch adding a tool-calling agent to your chatbot (design only)',
+        qs:['Walk through your Text-to-SQL safety pipeline.','How do you handle an ambiguous user question?']},
+      {n:9, focus:'Prompt rewrite', title:'Rewrite the Text-to-SQL prompt two ways',
+        dsa:'NeetCode Trees — 3 more problems',
+        learn:'Anthropic Prompt Engineering tutorial (remaining sections)',
+        build:'Rewrite Text-to-SQL prompt zero-shot vs few-shot, compare accuracy',
+        qs:['How do you prevent a destructive query from being generated?','How does schema introspection work?']},
+      {n:10, focus:'Job assistant brief', title:'Light Project Brief 3',
+        dsa:'LeetCode SQL 50 — 5 more problems',
+        learn:'Re-read your Job Application Assistant\u2019s two-stage pipeline',
+        build:'Write Project Brief 3 in bullet points, not full doc',
+        qs:['Why a two-stage pipeline instead of scoring everything with the LLM?','Why a hard-coded human-confirmation gate?']},
+      {n:11, focus:'Cost math', title:'Calculate real cost of 1,000 Text-to-SQL queries',
+        dsa:'NeetCode Graphs — 3 problems',
+        learn:'Eugene Yan \u2014 LLM Patterns (cost, caching)',
+        build:'Calculate $ cost of 1,000 queries through your Text-to-SQL tool',
+        qs:['How would you reduce LLM API costs at scale?']},
+      {n:12, focus:'System design sketch', title:'RAG bot for 100K docs, add rate limiting',
+        dsa:'NeetCode Graphs — 3 more problems',
+        learn:'Sketch "RAG bot for 100K docs" out loud, 5 minutes, no notes',
+        build:'Add basic rate limiting to one FastAPI project',
+        qs:['Design a rate-limiting strategy for your Text-to-SQL API.']},
+      {n:13, focus:'Polish + AWS skim', title:'GitHub READMEs, AWS concepts',
+        dsa:'Mixed DSA/SQL review',
+        learn:'AWS Cloud Practitioner Essentials \u2014 modules 1\u20132 only',
+        build:'Polish GitHub READMEs for all 4 projects (diagram + setup + demo link)',
+        qs:['EC2 vs Lambda \u2014 when would you use each for an AI app?']},
+      {n:14, focus:'Mock interview #1', title:'Full mixed-topic mock, debrief immediately',
+        dsa:'Rest from new DSA, review flashcards instead',
+        learn:'\u2014',
+        build:'Fix the weakest 2 answers right after the mock',
+        qs:['Say "start mock interview" \u2014 mixed Python / SQL / RAG / project questions.']}
+    ]
+  },
+  {
+    tag:'Week 03', tagClass:'wk3-tag', title:'Simulate the room', goal:'Interview simulation + apply',
+    days:[
+      {n:15, focus:'Weak-spot DSA', title:'Drill your weakest DSA category + HR prep',
+        dsa:'NeetCode \u2014 5 problems from your weakest category so far',
+        learn:'\u2014',
+        build:'System design: full written answer \u2014 reduce LLM API costs at scale',
+        qs:['Why GenAI and not traditional software engineering?','Why should we hire a fresher over an experienced candidate?']},
+      {n:16, focus:'System design + test', title:'Scaling RAG to 1M docs, weekly test',
+        dsa:'5 more problems from weakest category',
+        learn:'\u2014',
+        build:'System design: full written answer \u2014 scaling RAG to 1M docs',
+        qs:['Say "weekly test" for a check covering Week 2 material.']},
+      {n:17, focus:'Resume + LinkedIn', title:'Finalize resume with new numbers',
+        dsa:'3 problems, confidence maintenance',
+        learn:'\u2014',
+        build:'Add deployed URL + eval scores to resume, update LinkedIn write-ups',
+        qs:['Merge vs rebase, when would you use each?','Precision vs recall \u2014 a real-world example.']},
+      {n:18, focus:'Mock interview #2', title:'Full panel-style mock, fix gaps same day',
+        dsa:'3 problems',
+        learn:'\u2014',
+        build:'Fix every gap found in the mock immediately',
+        qs:['Say "start mock interview" \u2014 full panel style, all categories mixed.']},
+      {n:19, focus:'Rehearse projects', title:'Time all 4 project explanations at 90 seconds',
+        dsa:'3 problems',
+        learn:'\u2014',
+        build:'Rehearse all 4 project explanations out loud, timed',
+        qs:['Say "weekly test" for a final technical + coding check.']},
+      {n:20, focus:'Final review', title:'No new material \u2014 timed run-through of everything',
+        dsa:'Timed review of flagged weak problems only',
+        learn:'\u2014',
+        build:'Full run-through of your question answers, timed. Fix anything shaky.',
+        qs:['Re-answer any question from Weeks 1\u20132 you scored under 4/5 on.']},
+      {n:21, focus:'Start applying', title:'Submit to 5\u201310 roles, keep DSA maintenance going',
+        dsa:'30\u201345 min/day maintenance from here on',
+        learn:'\u2014',
+        build:'Apply to 5\u201310 roles from the "apply here first" list using your polished resume, deployed link, and GitHub',
+        qs:['\u2014']}
+    ]
+  }
+];
+
+const RESOURCES = [
+  {title:'DSA / SQL', links:[
+    ['NeetCode 150','https://neetcode.io/practice'],
+    ['LeetCode SQL 50','https://leetcode.com/studyplan/top-sql-50/']
+  ]},
+  {title:'RAG / Embeddings', links:[
+    ['Pinecone — Semantic Search','https://www.pinecone.io/learn/semantic-search/'],
+    ['Pinecone — Chunking Strategies','https://www.pinecone.io/learn/chunking-strategies/'],
+    ['Ragas docs','https://docs.ragas.io/']
+  ]},
+  {title:'Prompting / LLM APIs', links:[
+    ['Anthropic Prompt Engineering Tutorial','https://github.com/anthropics/prompt-eng-interactive-tutorial'],
+    ['Anthropic API Quickstart','https://docs.claude.com/en/docs/get-started'],
+    ['OpenAI Cookbook','https://cookbook.openai.com/']
+  ]},
+  {title:'Backend / Deployment', links:[
+    ['FastAPI official tutorial','https://fastapi.tiangolo.com/tutorial/'],
+    ['Docker Curriculum','https://docker-curriculum.com/'],
+    ['Render docs','https://render.com/docs']
+  ]},
+  {title:'LangChain / Agents', links:[
+    ['LangChain — Agents docs','https://python.langchain.com/docs/tutorials/agents/']
+  ]},
+  {title:'System design / Cloud', links:[
+    ['Eugene Yan — LLM Patterns','https://eugeneyan.com/writing/llm-patterns/'],
+    ['Chip Huyen — ML Interview Book','https://huyenchip.com/ml-interviews-book/'],
+    ['AWS Cloud Practitioner Essentials','https://explore.skillbuilder.aws/learn/course/external/view/elearning/134/aws-cloud-practitioner-essentials']
+  ]},
+  {title:'Mock practice', links:[
+    ['Pramp — free peer mock interviews','https://www.pramp.com/']
+  ]}
+];
+
+const QBANK = {
+  'Python':['Generators vs lists — memory tradeoffs.','What does async/await do under the hood?','The mutable default argument gotcha.','Write a timing decorator, live.'],
+  'SQL':['WHERE vs HAVING.','Explain a window function with an example.','Second-highest salary without LIMIT.','When does an index hurt performance?'],
+  'GenAI/LLMs':['Embeddings vs fine-tuning — when would you use each?','What do temperature and top-p do, and how do they interact?','Why do LLMs hallucinate, and how does RAG reduce it?','Zero-shot vs few-shot vs chain-of-thought.'],
+  'RAG':['Walk through a RAG pipeline end to end.','How do you choose chunk size and overlap?','Dense retrieval vs hybrid search (BM25 + embeddings).','How would you evaluate whether your RAG answers are good?'],
+  'LangChain':['What problem does LangChain solve over raw API calls?','Difference between a Chain and an Agent.','How does LangChain\u2019s memory abstraction work?'],
+  'FastAPI':['How does dependency injection work, and why use it?','Sync vs async route — when does it matter?','How would you add authentication to a FastAPI app?'],
+  'ML basics':['Precision vs recall — a real-world example.','What is overfitting, and how do you detect it?','Why train/validation/test, not just train/test?'],
+  'Git':['Merge vs rebase — when would you use each?','What goes in your .gitignore for an AI project specifically?'],
+  'AWS':['EC2 vs Lambda — when would you use each for an AI app?','What is S3 typically used for in an AI pipeline?','What does "serverless" trade off?'],
+  'System design':['Design a RAG-based customer support bot for 100K documents.','How would you reduce LLM API costs at scale?','Design a rate-limiting strategy for your Text-to-SQL API.'],
+  'HR':['Why GenAI, not traditional software engineering?','Tell me about a bug that took a long time to fix.','A design decision you\u2019d make differently now.','Why hire a fresher over an experienced candidate?']
+};
+
+function buildRunway(){
+  const strip = document.getElementById('runwayStrip');
+  WEEKS.forEach((wk,wi)=>{
+    wk.days.forEach(d=>{
+      const el = document.createElement('div');
+      el.className = 'stub wk'+(wi+1);
+      el.id = 'stub-'+d.n;
+      el.innerHTML = '<div><div class="stub-day">DAY</div><div class="stub-num">'+String(d.n).padStart(2,'0')+'</div></div>'
+        + '<div class="stub-focus">'+d.focus+'</div><div class="stub-dot"></div>';
+      el.addEventListener('click', ()=>{
+        document.getElementById('day-'+d.n).scrollIntoView({behavior:'smooth', block:'center'});
+        document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('open'));
+        document.getElementById('day-'+d.n).classList.add('open');
+      });
+      el.querySelector('.stub-dot').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        el.classList.toggle('done');
+        document.getElementById('check-'+d.n).classList.toggle('checked');
+        document.getElementById('check-'+d.n).innerHTML = el.classList.contains('done') ? '\u2713' : '';
+      });
+      strip.appendChild(el);
+    });
+  });
+}
+
+function buildWeeks(){
+  const host = document.getElementById('weeksHost');
+  WEEKS.forEach((wk,wi)=>{
+    const banner = document.createElement('div');
+    banner.className = 'week-banner';
+    banner.innerHTML = '<span class="week-tag '+wk.tagClass+'">'+wk.tag+'</span>'
+      + '<span class="week-title">'+wk.title+'</span>'
+      + '<span class="week-goal">'+wk.goal+'</span>';
+    host.appendChild(banner);
+
+    wk.days.forEach(d=>{
+      const card = document.createElement('div');
+      card.className = 'day-card';
+      card.id = 'day-'+d.n;
+      const qItems = d.qs.map(q=>'<li>'+q+'</li>').join('');
+      card.innerHTML =
+        '<div class="day-head">'
+          +'<div class="day-check" id="check-'+d.n+'"></div>'
+          +'<div class="day-num">DAY '+String(d.n).padStart(2,'0')+'</div>'
+          +'<div class="day-title">'+d.title+'</div>'
+          +'<div class="day-arrow">\u203a</div>'
+        +'</div>'
+        +'<div class="day-body">'
+          +'<div class="day-row"><div class="day-row-label">DSA / SQL</div>'+d.dsa+'</div>'
+          +'<div class="day-row"><div class="day-row-label b">Learn</div>'+d.learn+'</div>'
+          +'<div class="day-row"><div class="day-row-label b">Build</div>'+d.build+'</div>'
+          +'<div class="day-row"><div class="day-row-label">Interview questions</div><ul class="qa-list">'+qItems+'</ul></div>'
+        +'</div>';
+      card.querySelector('.day-head').addEventListener('click', (e)=>{
+        if(e.target.closest('.day-check')) return;
+        card.classList.toggle('open');
+      });
+      card.querySelector('.day-check').addEventListener('click', ()=>{
+        card.querySelector('.day-check').classList.toggle('checked');
+        card.querySelector('.day-check').innerHTML = card.querySelector('.day-check').classList.contains('checked') ? '\u2713' : '';
+        document.getElementById('stub-'+d.n).classList.toggle('done');
+      });
+      host.appendChild(card);
+    });
+  });
+}
+
+function buildResources(){
+  const host = document.getElementById('resHost');
+  RESOURCES.forEach(r=>{
+    const card = document.createElement('div');
+    card.className = 'res-card';
+    const links = r.links.map(l=>'<a href="'+l[1]+'" target="_blank" rel="noopener">'+l[0]+'</a>').join('');
+    card.innerHTML = '<h4>'+r.title+'</h4>'+links;
+    host.appendChild(card);
+  });
+}
+
+function buildQBank(){
+  const tabBar = document.getElementById('tabBar');
+  const tabHost = document.getElementById('tabHost');
+  const keys = Object.keys(QBANK);
+  keys.forEach((k,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn'+(i===0?' active':'');
+    btn.textContent = k;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-'+i).classList.add('active');
+    });
+    tabBar.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel'+(i===0?' active':'');
+    panel.id = 'panel-'+i;
+    const items = QBANK[k].map(q=>'<li>'+q+'</li>').join('');
+    panel.innerHTML = '<ul class="q-list">'+items+'</ul>';
+    tabHost.appendChild(panel);
+  });
+}
+
+buildRunway();
+buildWeeks();
+buildResources();
+buildQBank();
+</script>
+</body>
+</html>
